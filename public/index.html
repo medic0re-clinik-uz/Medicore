@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MediCore — CareTrack Clinic TYBT</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏥</text></svg>"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="./style.css"/>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+<body class="theme-light">
+
+<!-- LOGIN PAGE -->
+<div id="login-page" class="login-wrapper">
+  <div class="login-bg-grid"></div>
+  <div class="login-orbs">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+  </div>
+  <div class="login-card">
+    <div class="login-logo">
+      <div class="logo-icon">
+        <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M14 3C8.477 3 4 7.477 4 13v2a1 1 0 001 1h4v-4h2v4h2v-6h2v6h2v-4h2v4h4a1 1 0 001-1v-2c0-5.523-4.477-10-10-10z" fill="white" opacity="0.9"/>
+          <rect x="11" y="14" width="2" height="8" rx="1" fill="white"/>
+          <rect x="15" y="14" width="2" height="8" rx="1" fill="white"/>
+          <rect x="9" y="21" width="10" height="2" rx="1" fill="white"/>
+        </svg>
+      </div>
+      <div class="login-logo-text">
+        <h1>MediCore</h1>
+        <p class="login-sub">CareTrack Clinic</p>
+      </div>
+    </div>
+
+    <div class="login-form-section">
+      <h2>Xush kelibsiz</h2>
+      <p class="login-desc">Tibbiy yozuvlarni boshqarish tizimiga kiring</p>
+      <div class="form-group">
+        <label>Login</label>
+        <div class="input-wrap">
+          <span class="input-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          </span>
+          <input id="inp-username" type="text" placeholder="username" autocomplete="username"/>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Parol</label>
+        <div class="pwd-wrap input-wrap">
+          <span class="input-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+          </span>
+          <input id="inp-password" type="password" placeholder="••••••••" autocomplete="current-password"/>
+          <button class="pwd-toggle" onclick="togglePwd()">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+        </div>
+      </div>
+      <div id="login-error" class="alert alert-danger hidden"></div>
+      <button class="btn btn-primary btn-block login-btn" onclick="doLogin()">
+        <span>Kirish</span>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </button>
+    </div>
+
+    <div class="login-hints">
+      <div class="hints-title">
+        <span class="hints-line"></span>
+        <span>Test hisoblar</span>
+        <span class="hints-line"></span>
+      </div>
+      <div class="hints-grid">
+        <button class="hint-btn" onclick="fillLogin('admin','Admin@2024')">
+          <span class="hint-role admin-role">Admin</span>
+          <span class="hint-creds">admin / Admin@2024</span>
+        </button>
+        <button class="hint-btn" onclick="fillLogin('doctor1','Doc@1234')">
+          <span class="hint-role clinic-role">Klinitsist</span>
+          <span class="hint-creds">doctor1 / Doc@1234</span>
+        </button>
+        <button class="hint-btn" onclick="fillLogin('reception','Rec@5678')">
+          <span class="hint-role recep-role">Qabulxona</span>
+          <span class="hint-creds">reception / Rec@5678</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div id="app" class="hidden">
+
+  <!-- Sidebar overlay for mobile -->
+  <div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
+
+  <!-- Mobile top bar -->
+  <div class="mobile-topbar">
+    <div class="mobile-logo">
+      <div class="mobile-logo-mark">
+        <svg width="14" height="14" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M14 3C8.477 3 4 7.477 4 13v2a1 1 0 001 1h4v-4h2v4h2v-6h2v6h2v-4h2v4h4a1 1 0 001-1v-2c0-5.523-4.477-10-10-10z" fill="white"/>
+          <rect x="11" y="14" width="2" height="8" rx="1" fill="white"/>
+          <rect x="15" y="14" width="2" height="8" rx="1" fill="white"/>
+          <rect x="9" y="21" width="10" height="2" rx="1" fill="white"/>
+        </svg>
+      </div>
+      <span class="mobile-logo-name">MediCore</span>
+    </div>
+    <button class="hamburger" onclick="toggleSidebar()" aria-label="Menu">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+        <line x1="3" y1="6" x2="21" y2="6"/>
+        <line x1="3" y1="12" x2="21" y2="12"/>
+        <line x1="3" y1="18" x2="21" y2="18"/>
+      </svg>
+    </button>
+  </div>
+
+  <aside id="sidebar">
+    <div class="sidebar-logo">
+      <div class="s-logo-mark">
+        <svg width="16" height="16" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M14 3C8.477 3 4 7.477 4 13v2a1 1 0 001 1h4v-4h2v4h2v-6h2v6h2v-4h2v4h4a1 1 0 001-1v-2c0-5.523-4.477-10-10-10z" fill="white"/>
+          <rect x="11" y="14" width="2" height="8" rx="1" fill="white"/>
+          <rect x="15" y="14" width="2" height="8" rx="1" fill="white"/>
+          <rect x="9" y="21" width="10" height="2" rx="1" fill="white"/>
+        </svg>
+      </div>
+      <div>
+        <div class="s-logo-name">MediCore</div>
+        <div class="s-logo-sub">Care Track</div>
+      </div>
+    </div>
+
+    <div class="sidebar-user">
+      <div id="s-avatar" class="s-avatar"></div>
+      <div class="s-user-info">
+        <div id="s-name" class="s-name"></div>
+        <div id="s-role" class="s-role"></div>
+      </div>
+      <div class="s-online-dot"></div>
+    </div>
+
+    <div class="sidebar-nav-label">Navigatsiya</div>
+    <nav id="sidebar-nav"></nav>
+
+    <div class="sidebar-bottom">
+      <button class="theme-toggle" onclick="toggleTheme()">
+        <span id="theme-icon">🌙</span>
+        <span id="theme-label">Tungi rejim</span>
+      </button>
+      <button class="btn-logout" onclick="doLogout()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        Chiqish
+      </button>
+    </div>
+  </aside>
+
+  <main id="main-content">
+    <div id="page-content"></div>
+  </main>
+</div>
+
+<!-- MODAL -->
+<div id="modal-overlay" class="modal-overlay hidden" onclick="closeModal(event)">
+  <div class="modal-box" id="modal-box">
+    <div class="modal-header">
+      <h3 id="modal-title"></h3>
+      <button class="modal-close" onclick="closeModal()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body" id="modal-body"></div>
+  </div>
+</div>
+
+<!-- CONFIRM DIALOG -->
+<div id="confirm-overlay" class="modal-overlay hidden">
+  <div class="modal-box confirm-box">
+    <div class="modal-body">
+      <div class="confirm-icon">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      </div>
+      <p id="confirm-msg"></p>
+      <div class="confirm-btns">
+        <button class="btn btn-outline" onclick="closeConfirm()">Bekor qilish</button>
+        <button class="btn btn-danger" id="confirm-ok">O'chirish</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast" class="toast hidden"></div>
+
+<script src="./js/api.js"></script>
+<script src="./js/app.js"></script>
+
+<!-- Mobile sidebar toggle (app.js ga tegmasdan) -->
+<script>
+function toggleSidebar() {
+  const sb = document.getElementById('sidebar');
+  const ov = document.getElementById('sidebar-overlay');
+  const isOpen = sb.classList.contains('open');
+  if (isOpen) {
+    sb.classList.remove('open');
+    ov.classList.remove('active');
+  } else {
+    sb.classList.add('open');
+    ov.classList.add('active');
+  }
+}
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebar-overlay').classList.remove('active');
+}
+// Nav itemga bosganda mobileda sidebарни yopish
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('sidebar-nav')?.addEventListener('click', (e) => {
+    if (e.target.closest('.nav-item') && window.innerWidth <= 900) {
+      closeSidebar();
+    }
+  });
+});
+</script>
+</body>
+</html>
